@@ -22,6 +22,7 @@ const Navbar = (props: Props) => {
           />
         </section>
       </div> */}
+      {/* abdffghehtghyrhyjj */}
 
       <div className="flex items-center justify-between">
         {/* Left side: Weather text and sun icon */}
