@@ -1,186 +1,102 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronLeft,
-  faChevronRight,
-  faPlay,
-  faPause,
-} from "@fortawesome/free-solid-svg-icons";
 
-const SLIDES = [
-  { id: 1, image: "/banner-deals.png", alt: "JavaScript" },
-  { id: 2, image: "/banner-deals.png", alt: "CSS" },
-  { id: 3, image: "/banner-deals.png", alt: "HTML" },
+const slides = [
+  {
+    img: "/banner-deals.png",
+  },
+  {
+    img: "/banner-deals.png",
+  },
+  {
+    img: "/banner-deals.png",
+  },
 ];
 
-const CircularSlider = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAutoplayRunning, setIsAutoplayRunning] = useState(true);
-  const sliderRef = useRef<HTMLDivElement>(null);
-  const slidesHolderRef = useRef<HTMLDivElement>(null);
-  const autoplayRef = useRef<NodeJS.Timeout | null>(null);
+export default function Component() {
+  const [active, setActive] = useState(0);
+  const [rotate, setRotate] = useState(0);
 
-  const stepAngle = (2 * Math.PI) / SLIDES.length;
-  const animationDuration = 600;
-  const autoplayInterval = 2500;
+  const rotateAdd = 360 / slides.length;
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (sliderRef.current && slidesHolderRef.current) {
-        const sliderSize = 100;
-        const slideSize = 15;
-        const w = sliderRef.current.offsetWidth;
-        const h = sliderRef.current.offsetHeight;
-        const radius =
-          2 * h <= w ? h * (sliderSize / 100) : (w / 2) * (sliderSize / 100);
+  const nextSlide = () => {
+    setActive((prev) => (prev + 1) % slides.length);
+    setRotate((prev) => prev + rotateAdd);
+  };
 
-        sliderRef.current.style.width = `${2 * radius}px`;
-        sliderRef.current.style.height = `${radius}px`;
-
-        const r = 2 * radius * (1 - slideSize / 100);
-        slidesHolderRef.current.style.width = `${r}px`;
-        slidesHolderRef.current.style.height = `${r}px`;
-        slidesHolderRef.current.style.marginTop = `${
-          radius * (slideSize / 100)
-        }px`;
-
-        const slidesSize = Math.min(
-          2 * radius * (slideSize / 100),
-          stepAngle * radius * (1 - slideSize / 100) - 50
-        );
-        const slides = slidesHolderRef.current.querySelectorAll(
-          ".slides-holder__item"
-        );
-        slides.forEach((slide, i) => {
-          const x = (r / 2) * Math.cos(stepAngle * i - Math.PI / 2);
-          const y = (r / 2) * Math.sin(stepAngle * i - Math.PI / 2);
-          (
-            slide as HTMLElement
-          ).style.transform = `translate(${x}px, ${y}px) rotate(${
-            ((stepAngle * 180) / Math.PI) * i
-          }deg)`;
-          (slide as HTMLElement).style.width = `${slidesSize}px`;
-          (slide as HTMLElement).style.height = `${slidesSize}px`;
-        });
-      }
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    if (isAutoplayRunning) {
-      autoplayRef.current = setInterval(() => {
-        rotate(-1);
-      }, autoplayInterval + 20);
-    } else {
-      if (autoplayRef.current) {
-        clearInterval(autoplayRef.current);
-      }
-    }
-    return () => {
-      if (autoplayRef.current) {
-        clearInterval(autoplayRef.current);
-      }
-    };
-  }, [isAutoplayRunning]);
-
-  const rotate = (multiplier: number) => {
-    setCurrentSlide((prevSlide) => {
-      let newSlide = prevSlide - multiplier;
-      if (newSlide < 0) {
-        newSlide = SLIDES.length - 1;
-      } else if (newSlide >= SLIDES.length) {
-        newSlide = 0;
-      }
-      return newSlide;
-    });
+  const prevSlide = () => {
+    setActive((prev) => (prev - 1 + slides.length) % slides.length);
+    setRotate((prev) => prev - rotateAdd);
   };
 
   return (
-    <div className="w-full h-full box-border p-5">
+    <div className="relative w-full h-screen overflow-hidden bg-[#ffb61a]">
+      <div className="absolute top-0 left-0 w-1/2 h-full" />
       <div
-        ref={sliderRef}
-        className="w-full h-full overflow-hidden flex justify-center items-end bg-[#222]"
+        className="absolute bottom-0 left-1/2 w-[1300px] h-[1300px] rounded-full transition-transform duration-500 ease-in-out"
+        style={{ transform: `translate(-50%, 50%) rotate(${rotate}deg)` }}
       >
-        <div className="relative flex justify-center box-border p-5 pb-0 overflow-hidden">
-          <div className="absolute z-10 top-1/2 left-0 transform -translate-y-1/2">
-            <button
-              onClick={() => rotate(1)}
-              className="text-[#8eb8e5] opacity-70 hover:opacity-100 hover:text-[1.7em] transition-all duration-600"
-            >
-              <FontAwesomeIcon icon={faChevronLeft} />
-            </button>
-          </div>
-          <div className="absolute z-10 top-1/2 right-0 transform -translate-y-1/2">
-            <button
-              onClick={() => rotate(-1)}
-              className="text-[#8eb8e5] opacity-70 hover:opacity-100 hover:text-[1.7em] transition-all duration-600"
-            >
-              <FontAwesomeIcon icon={faChevronRight} />
-            </button>
-          </div>
-          <div className="absolute z-10 bottom-0 left-1/2 transform -translate-x-1/2">
-            <button
-              onClick={() => setIsAutoplayRunning(!isAutoplayRunning)}
-              className="text-[#8eb8e5] opacity-70 hover:opacity-100 hover:text-[1.7em] transition-all duration-600"
-            >
-              <FontAwesomeIcon icon={isAutoplayRunning ? faPause : faPlay} />
-            </button>
-          </div>
+        <div className="absolute inset-0 rounded-full bg-[#ffc234]" />
+        <div className="absolute inset-[100px] rounded-full bg-[#ffcd5b]" />
+        {slides.map((slide, index) => (
           <div
-            ref={slidesHolderRef}
-            className="rounded-full border-2 border-[#8eb8e5] origin-center box-border flex justify-center items-center relative z-[100]"
-            style={{
-              transform: `rotate(${
-                (-currentSlide * stepAngle * 180) / Math.PI
-              }deg)`,
-              transition: `transform ${animationDuration}ms`,
-            }}
+            key={index}
+            className="absolute w-full h-full text-center"
+            style={{ rotate: `${60 * index}deg` }}
           >
-            {SLIDES.map((slide, index) => (
-              <div
-                key={slide.id}
-                className={`rounded-full border-2 border-[#7c99b4] absolute box-border origin-center bg-[#222] transition-all duration-300 ${
-                  index === currentSlide ? "filter-none" : "brightness-[70%]"
-                }`}
-              >
-                <Image
-                  src={slide.image}
-                  alt={slide.alt}
-                  width={100}
-                  height={100}
-                  className="rounded-full"
-                />
-              </div>
-            ))}
+            <Image
+              src={slide.img}
+              alt="anything"
+              width={420}
+              height={420}
+              className="h-[420px] w-[30%] absolute top-[20%] left-1/4 transform -translate-x-1/2"
+            />
           </div>
-          <div className="absolute bottom-0 z-0">
-            {SLIDES.map((slide, index) => (
-              <div
-                key={slide.id}
-                className={`w-full h-0 opacity-0 flex flex-col items-center justify-center transition-opacity duration-600 ${
-                  index === currentSlide ? "h-full opacity-100" : ""
-                }`}
-              >
-                <h1 className="text-white text-2xl font-sans pt-5">
-                  {slide.alt}
-                </h1>
-                <p className="text-white text-base font-sans mt-5 px-[10%] overflow-hidden text-ellipsis">
-                  Description for {slide.alt}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+        ))}
       </div>
+
+      <div className="">
+        {slides.map((slide, index) => (
+          <div
+            key={index}
+            className={`${
+              active === index ? "block" : "hidden"
+            } animate-fadeIn`}
+          ></div>
+        ))}
+      </div>
+
+      <button
+        onClick={prevSlide}
+        className="absolute top-1/2 left-[250px] text-[100px] bg-transparent text-white font-bold opacity-30 hover:opacity-100"
+      >
+        {"<"}
+      </button>
+      <button
+        onClick={nextSlide}
+        className="absolute top-1/2 right-[250px] text-[100px] bg-transparent text-white font-bold opacity-30 hover:opacity-100"
+      >
+        {">"}
+      </button>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(100px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 0.5s ease-in-out forwards;
+        }
+      `}</style>
     </div>
   );
-};
-
-export default CircularSlider;
+}
