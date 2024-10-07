@@ -6,15 +6,15 @@ import Image from "next/image";
 const initialSlides = [
   {
     img: "/banner-deals.png",
-    position: "left", // -90 degrees
+    position: "left",
   },
   {
     img: "/banner-deals.png",
-    position: "center", // 0 degrees
+    position: "center",
   },
   {
     img: "/banner-deals.png",
-    position: "right", // 90 degrees
+    position: "right",
   },
 ];
 
@@ -41,7 +41,7 @@ export default function Component() {
       return newSlides;
     });
 
-    setTimeout(() => setIsAnimating(false), 500); // Match this with CSS transition duration
+    setTimeout(() => setIsAnimating(false), 500);
   };
 
   const moveLeft = () => {
