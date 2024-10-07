@@ -3,100 +3,117 @@
 import React, { useState } from "react";
 import Image from "next/image";
 
-const slides = [
+const initialSlides = [
   {
     img: "/banner-deals.png",
+    position: "left", // -90 degrees
   },
   {
     img: "/banner-deals.png",
+    position: "center", // 0 degrees
   },
   {
     img: "/banner-deals.png",
+    position: "right", // 90 degrees
   },
 ];
 
 export default function Component() {
-  const [active, setActive] = useState(0);
-  const [rotate, setRotate] = useState(0);
+  const [slides, setSlides] = useState(initialSlides);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  const rotateAdd = 360 / slides.length;
+  const moveRight = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
 
-  const nextSlide = () => {
-    setActive((prev) => (prev + 1) % slides.length);
-    setRotate((prev) => prev + rotateAdd);
+    setSlides((prevSlides) => {
+      const newSlides = [...prevSlides];
+      const leftSlide = newSlides.find((slide) => slide.position === "left");
+      const centerSlide = newSlides.find(
+        (slide) => slide.position === "center"
+      );
+      const rightSlide = newSlides.find((slide) => slide.position === "right");
+
+      leftSlide.position = "center";
+      centerSlide.position = "right";
+      rightSlide.position = "left";
+
+      return newSlides;
+    });
+
+    setTimeout(() => setIsAnimating(false), 500); // Match this with CSS transition duration
   };
 
-  const prevSlide = () => {
-    setActive((prev) => (prev - 1 + slides.length) % slides.length);
-    setRotate((prev) => prev - rotateAdd);
+  const moveLeft = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+
+    setSlides((prevSlides) => {
+      const newSlides = [...prevSlides];
+      const leftSlide = newSlides.find((slide) => slide.position === "left");
+      const centerSlide = newSlides.find(
+        (slide) => slide.position === "center"
+      );
+      const rightSlide = newSlides.find((slide) => slide.position === "right");
+
+      leftSlide.position = "right";
+      centerSlide.position = "left";
+      rightSlide.position = "center";
+
+      return newSlides;
+    });
+
+    setTimeout(() => setIsAnimating(false), 500); // Match this with CSS transition duration
   };
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-[#ffb61a]">
       <div className="absolute top-0 left-0 w-1/2 h-full" />
-      <div
-        className="absolute bottom-0 left-1/2 w-[1300px] h-[1300px] rounded-full transition-transform duration-500 ease-in-out"
-        style={{ transform: `translate(-50%, 50%) rotate(${rotate}deg)` }}
-      >
-        <div className="absolute inset-0 rounded-full bg-[#ffc234]" />
-        <div className="absolute inset-[100px] rounded-full bg-[#ffcd5b]" />
-        {slides.map((slide, index) => (
-          <div
-            key={index}
-            className="absolute w-full h-full text-center"
-            style={{ rotate: `${60 * index}deg` }}
-          >
-            <Image
-              src={slide.img}
-              alt="anything"
-              width={420}
-              height={420}
-              className="h-[420px] w-[30%] absolute top-[20%] left-1/4 transform -translate-x-1/2"
-            />
-          </div>
-        ))}
-      </div>
 
-      <div className="">
-        {slides.map((slide, index) => (
-          <div
-            key={index}
-            className={`${
-              active === index ? "block" : "hidden"
-            } animate-fadeIn`}
-          ></div>
-        ))}
-      </div>
-
-      <button
-        onClick={prevSlide}
-        className="absolute top-1/2 left-[250px] text-[100px] bg-transparent text-white font-bold opacity-30 hover:opacity-100"
-      >
-        {"<"}
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute top-1/2 right-[250px] text-[100px] bg-transparent text-white font-bold opacity-30 hover:opacity-100"
-      >
-        {">"}
-      </button>
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(100px);
+      {slides.map((slide, index) => (
+        <div
+          key={index}
+          className={`absolute transition-all duration-500 ease-in-out cursor-pointer
+            ${
+              slide.position === "left"
+                ? "bottom-[-100px] left-[-100px] w-[400px] h-[400px] z-10"
+                : ""
+            }
+            ${
+              slide.position === "center"
+                ? "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] z-20"
+                : ""
+            }
+            ${
+              slide.position === "right"
+                ? "bottom-[-100px] right-[-100px] w-[400px] h-[400px] z-10"
+                : ""
+            }
+          `}
+          onClick={() =>
+            slide.position === "left"
+              ? moveRight()
+              : slide.position === "right"
+              ? moveLeft()
+              : null
           }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-in-out forwards;
-        }
-      `}</style>
+        >
+          <div className="absolute inset-0 rounded-full bg-[#ffc234]" />
+          <div
+            className={`absolute rounded-full bg-[#ffcd5b] 
+            ${slide.position === "center" ? "inset-[50px]" : "inset-[30px]"}`}
+          />
+          <Image
+            src={slide.img}
+            alt={`Slide ${index + 1}`}
+            width={slide.position === "center" ? 500 : 300}
+            height={slide.position === "center" ? 500 : 300}
+            className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+              ${slide.position !== "center" ? "opacity-40" : ""}
+            `}
+          />
+        </div>
+      ))}
     </div>
   );
 }
