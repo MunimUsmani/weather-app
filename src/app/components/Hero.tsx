@@ -1,119 +1,145 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
+import React, { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { MotionPathPlugin } from "gsap/dist/MotionPathPlugin";
 
-const initialSlides = [
-  {
-    img: "/banner-deals.png",
-    position: "left",
-  },
-  {
-    img: "/banner-deals.png",
-    position: "center",
-  },
-  {
-    img: "/banner-deals.png",
-    position: "right",
-  },
+gsap.registerPlugin(MotionPathPlugin);
+
+const images: string[] = [
+  "/banner-deals.png",
+  "/banner-deals.png",
+  "/banner-deals.png",
+  "/banner-deals.png",
+  "/banner-deals.png",
+  "/banner-deals.png",
+  "/banner-deals.png",
+  "/banner-deals.png",
 ];
 
-export default function Component() {
-  const [slides, setSlides] = useState(initialSlides);
-  const [isAnimating, setIsAnimating] = useState(false);
+export default function Home() {
+  const [activeItem, setActiveItem] = useState<number>(4);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const circlePathRef = useRef<SVGPathElement | null>(null);
+  const itemsRef = useRef<(HTMLImageElement | null)[]>([]);
 
-  const moveRight = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
+  useEffect(() => {
+    if (!wrapperRef.current) return;
 
-    setSlides((prevSlides) => {
-      const newSlides = [...prevSlides];
-      const leftSlide = newSlides.find((slide) => slide.position === "left");
-      const centerSlide = newSlides.find(
-        (slide) => slide.position === "center"
-      );
-      const rightSlide = newSlides.find((slide) => slide.position === "right");
+    const circlePath = MotionPathPlugin.convertToPath("#holder", false)[0];
+    circlePath.id = "circlePath";
+    const svg = wrapperRef.current.querySelector("svg");
+    if (svg) {
+      svg.prepend(circlePath);
+    }
+    circlePathRef.current = circlePath;
 
-      leftSlide.position = "center";
-      centerSlide.position = "right";
-      rightSlide.position = "left";
+    const numItems = images.length;
 
-      return newSlides;
+    gsap.set(itemsRef.current, {
+      motionPath: {
+        path: circlePath,
+        align: circlePath,
+        alignOrigin: [0.5, 0.5],
+        end: (i: number) => i / numItems,
+      },
+      scale: 0.9,
+      rotate: (_: any, target: any) => -gsap.getProperty(target, "rotation"),
     });
 
-    setTimeout(() => setIsAnimating(false), 500);
+    gsap.set(wrapperRef.current, { rotation: 90, transformOrigin: "center" });
+
+    setActiveClass(activeItem);
+    updateImageRotation();
+  }, []);
+
+  const setActiveClass = (index: number) => {
+    itemsRef.current.forEach((item, i) => {
+      if (!item) return;
+      if (i === index) {
+        item.classList.add("active");
+        gsap.to(item, { scale: 4.8, duration: 0.3, opacity: 1 });
+      } else {
+        item.classList.remove("active");
+        gsap.to(item, { scale: 2.5, duration: 0.3, opacity: 0.5 });
+      }
+    });
   };
 
-  const moveLeft = () => {
+  const moveWheel = (direction: number) => {
     if (isAnimating) return;
     setIsAnimating(true);
 
-    setSlides((prevSlides) => {
-      const newSlides = [...prevSlides];
-      const leftSlide = newSlides.find((slide) => slide.position === "left");
-      const centerSlide = newSlides.find(
-        (slide) => slide.position === "center"
-      );
-      const rightSlide = newSlides.find((slide) => slide.position === "right");
+    const numItems = images.length;
+    const newActiveItem = (activeItem + direction + numItems) % numItems;
+    setActiveItem(newActiveItem);
+    setActiveClass(newActiveItem);
 
-      leftSlide.position = "right";
-      centerSlide.position = "left";
-      rightSlide.position = "center";
+    if (!wrapperRef.current) return;
 
-      return newSlides;
+    gsap.to(wrapperRef.current, {
+      rotation: `+=${(-direction * 360) / numItems}`,
+      transformOrigin: "center",
+      duration: 3,
+      ease: "elastic.out(1.5, 0.5)",
+      onUpdate: updateImageRotation,
+      onComplete: () => setIsAnimating(false),
     });
+  };
 
-    setTimeout(() => setIsAnimating(false), 500); // Match this with CSS transition duration
+  const onItemClick = (index: number) => {
+    if (isAnimating || index === activeItem) return;
+    let diff = index - activeItem;
+    if (Math.abs(diff) > images.length / 2) {
+      diff = diff > 0 ? diff - images.length : diff + images.length;
+    }
+    moveWheel(diff);
+  };
+
+  const updateImageRotation = () => {
+    if (!wrapperRef.current) return;
+    const wrapperRotation = gsap.getProperty(wrapperRef.current, "rotation");
+    itemsRef.current.forEach((item) => {
+      if (item) {
+        gsap.set(item, { rotate: -wrapperRotation });
+      }
+    });
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-[#ffb61a]">
-      <div className="absolute top-0 left-0 w-1/2 h-full" />
-
-      {slides.map((slide, index) => (
-        <div
-          key={index}
-          className={`absolute transition-all duration-500 ease-in-out cursor-pointer
-            ${
-              slide.position === "left"
-                ? "bottom-[-100px] left-[-100px] w-[400px] h-[400px] z-10"
-                : ""
-            }
-            ${
-              slide.position === "center"
-                ? "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] z-20"
-                : ""
-            }
-            ${
-              slide.position === "right"
-                ? "bottom-[-100px] right-[-100px] w-[400px] h-[400px] z-10"
-                : ""
-            }
-          `}
-          onClick={() =>
-            slide.position === "left"
-              ? moveRight()
-              : slide.position === "right"
-              ? moveLeft()
-              : null
-          }
-        >
-          <div className="absolute inset-0 rounded-full bg-[#ffc234]" />
-          <div
-            className={`absolute rounded-full bg-[#ffcd5b] 
-            ${slide.position === "center" ? "inset-[50px]" : "inset-[30px]"}`}
-          />
-          <Image
-            src={slide.img}
-            alt={`Slide ${index + 1}`}
-            width={slide.position === "center" ? 500 : 300}
-            height={slide.position === "center" ? 500 : 300}
-            className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-              ${slide.position !== "center" ? "opacity-40" : ""}
-            `}
-          />
+    <section
+      id="home-section-1"
+      className="bg-yellow-400 w-full h-screen overflow-hidden pt-[5rem]"
+    >
+      <div className="relative mt-[43rem]">
+        <div ref={wrapperRef} className="relative">
+          {images.map((image, index) => (
+            <img
+              key={index}
+              ref={(el) => (itemsRef.current[index] = el)}
+              className={`w-[100px] h-[100px] text-white text-center p-[0.2rem] bg-[#BB1112] leading-[50px] text-2xl font-roboto rounded-full z-10 cursor-pointer ${
+                activeItem === index ? "active" : ""
+              }`}
+              src={image}
+              alt=""
+              onClick={() => onItemClick(index)}
+            />
+          ))}
+          <svg
+            viewBox="0 0 300 300"
+            className="h-[1600px] w-[1600px] overflow-visible z-[-1] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 "
+          >
+            <circle
+              id="holder"
+              className="fill-none"
+              cx="151"
+              cy="151"
+              r="150"
+            />
+          </svg>
         </div>
-      ))}
-    </div>
+      </div>
+    </section>
   );
 }
