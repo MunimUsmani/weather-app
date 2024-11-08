@@ -5,18 +5,19 @@ export default function Component() {
     <div className="bg-white p-6 md:p-12">
       <div className="mx-auto max-w-7xl grid gap-8 lg:grid-cols-2 lg:gap-10 items-center">
         {/* Left Section */}
-        <div className="space-y-6 lg:space-y-8">
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-purple-700 lg:leading-snug">
-            Start making money from your returns.
+        <div className="space-y-6 lg:space-y-8 mt-[8rem]">
+          <h1 className="text-xl md:text-5xl font-bold tracking-tight text-purple-700">
+            Start making money <br />
+            from your returns.
           </h1>
           <p className="text-md text-gray-600">
             Built for Shopify merchants of all sizes.
           </p>
           <div className="flex flex-wrap gap-4">
-            <button className="bg-purple-700 text-white rounded-full px-6 py-3 text-sm font-semibold transition-colors duration-200">
+            <button className="bg-purple-700 text-white rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-200">
               🚀 Install app now
             </button>
-            <button className="bg-white hover:bg-gray-50 text-gray-800 rounded-full px-6 py-3 text-sm font-semibold border border-gray-300 transition-colors duration-200 flex items-center gap-2">
+            <button className="bg-white hover:bg-gray-50 text-gray-800 rounded-full px-4 py-2 text-sm font-semibold border border-gray-300 transition-colors duration-200 flex items-center gap-2">
               💎 Built for Shopify
             </button>
           </div>
