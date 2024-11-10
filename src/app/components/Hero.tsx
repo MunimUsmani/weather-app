@@ -2,10 +2,15 @@ import Image from "next/image";
 
 export default function Component() {
   return (
-    <div className="bg-white p-6 md:p-12">
+    <div className="bg-white p-6 md:p-12 relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <Image src="/vec2.png" alt="" layout="fill" objectFit="cover" />
+      </div>
+
       <div className="mx-auto max-w-7xl grid gap-8 lg:grid-cols-2 lg:gap-10 items-center">
         {/* Left Section */}
-        <div className="space-y-6 lg:space-y-8 mt-[8rem]">
+        <div className="space-y-6 lg:space-y-8 mt-[8rem] relative">
           <h1 className="text-xl md:text-5xl font-bold tracking-tight text-purple-700">
             Start making money <br />
             from your returns.
@@ -21,15 +26,33 @@ export default function Component() {
               💎 Built for Shopify
             </button>
           </div>
+
+          {/* Dollar Sign Vector Bottom Left */}
+          <div className="absolute -bottom-20 left-0">
+            <Image src="/vector.png" alt="" width={24} height={24} />
+          </div>
         </div>
 
         {/* Right Section */}
         <div className="relative flex items-center">
           {/* Background decorative elements */}
           <div className="absolute -z-10 -right-6 bottom-10 flex flex-col gap-4 transform">
-            <div className="w-16 h-16 bg-purple-200 rounded-md"></div>
-            <div className="w-20 h-20 bg-purple-100 rounded-md"></div>
-            <span className="text-purple-500 text-2xl">$</span>
+            <Image
+              src="/box1.png"
+              alt=""
+              width={64}
+              height={64}
+              className="rounded-md"
+            />
+            <Image
+              src="/box2.png"
+              alt=""
+              width={80}
+              height={80}
+              className="rounded-md"
+            />
+            {/* Dollar Sign Vector */}
+            <Image src="/vec1.png" alt="" width={24} height={24} />
           </div>
 
           {/* Main card with image */}
