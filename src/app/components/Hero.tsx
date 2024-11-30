@@ -12,23 +12,33 @@ const donationPoints = [
 ];
 
 export default function DonationSlider() {
-  const [selectedAmount, setSelectedAmount] = useState(25000);
+  const [selectedAmount, setSelectedAmount] = useState(6000);
 
   const selectedPoint =
     donationPoints.find((point) => point.value === selectedAmount) ||
-    donationPoints[2];
+    donationPoints[0];
+  const selectedIndex = donationPoints.findIndex(
+    (point) => point.value === selectedAmount
+  );
 
   return (
     <div className="max-w-xl mx-auto p-6">
-      <div className="text-center mb-8">
-        <h2 className="text-lg font-medium mb-2">
-          Send{" "}
-          <Heart className="inline-block w-5 h-5 fill-orange-500 text-orange-500" />{" "}
-          {selectedPoint.kits} Emergency Birth Kits
-        </h2>
+      <div className="relative mb-8">
+        <div
+          className="absolute top-0 left-0 transition-all duration-300 text-center w-full"
+          style={{
+            transform: `translateX(${selectedIndex * 25}%)`,
+          }}
+        >
+          <h2 className="text-lg font-medium inline-block bg-white px-2">
+            Send{" "}
+            <Heart className="inline-block w-5 h-5 fill-orange-500 text-orange-500" />{" "}
+            {selectedPoint.kits} Emergency Birth Kits
+          </h2>
+        </div>
       </div>
 
-      <div className="relative mb-12">
+      <div className="relative mb-16 mt-20">
         {/* Line connecting points */}
         <div className="absolute h-0.5 bg-gray-200 left-0 right-0 top-1/2 -translate-y-1/2" />
 
@@ -36,11 +46,7 @@ export default function DonationSlider() {
         <div
           className="absolute h-0.5 bg-orange-500 left-0 top-1/2 -translate-y-1/2 transition-all duration-300"
           style={{
-            width: `${
-              (donationPoints.findIndex((p) => p.value === selectedAmount) +
-                1) *
-              (100 / donationPoints.length)
-            }%`,
+            width: `${(selectedIndex + 1) * (100 / donationPoints.length)}%`,
           }}
         />
 
