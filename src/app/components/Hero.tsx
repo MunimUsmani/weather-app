@@ -1,103 +1,95 @@
-import Image from "next/image";
+"use client";
 
-export default function Component() {
+import { useState } from "react";
+import { Heart } from "lucide-react";
+
+const donationPoints = [
+  { value: 6000, label: "Rs 6,000", kits: 4 },
+  { value: 15000, label: "Rs 15K", kits: 10 },
+  { value: 25000, label: "Rs 25K", kits: 18 },
+  { value: 35000, label: "Rs 35K", kits: 24 },
+  { value: 60000, label: "Rs 60K", kits: 40 },
+];
+
+export default function DonationSlider() {
+  const [selectedAmount, setSelectedAmount] = useState(25000);
+
+  const selectedPoint =
+    donationPoints.find((point) => point.value === selectedAmount) ||
+    donationPoints[2];
+
   return (
-    <div className="bg-white p-6 md:p-12 relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <Image src="/vec2.png" alt="" layout="fill" objectFit="cover" />
+    <div className="max-w-xl mx-auto p-6">
+      <div className="text-center mb-8">
+        <h2 className="text-lg font-medium mb-2">
+          Send{" "}
+          <Heart className="inline-block w-5 h-5 fill-orange-500 text-orange-500" />{" "}
+          {selectedPoint.kits} Emergency Birth Kits
+        </h2>
       </div>
 
-      <div className="mx-auto max-w-7xl grid gap-8 lg:grid-cols-2 lg:gap-10 items-center">
-        {/* Left Section */}
-        <div className="space-y-6 lg:space-y-8 mt-[8rem] relative">
-          <h1 className="text-xl md:text-5xl font-bold tracking-tight text-purple-700">
-            Start making money <br />
-            from your returns.
-          </h1>
-          <p className="text-md text-gray-600">
-            Built for Shopify merchants of all sizes.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <button className="bg-purple-700 text-white rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-200">
-              🚀 Install app now
+      <div className="relative mb-12">
+        {/* Line connecting points */}
+        <div className="absolute h-0.5 bg-gray-200 left-0 right-0 top-1/2 -translate-y-1/2" />
+
+        {/* Active line */}
+        <div
+          className="absolute h-0.5 bg-orange-500 left-0 top-1/2 -translate-y-1/2 transition-all duration-300"
+          style={{
+            width: `${
+              (donationPoints.findIndex((p) => p.value === selectedAmount) +
+                1) *
+              (100 / donationPoints.length)
+            }%`,
+          }}
+        />
+
+        {/* Points */}
+        <div className="relative flex justify-between">
+          {donationPoints.map((point) => (
+            <button
+              key={point.value}
+              onClick={() => setSelectedAmount(point.value)}
+              className="relative group focus:outline-none"
+            >
+              {/* Dot */}
+              <div
+                className={`
+                w-4 h-4 rounded-full border-2 transition-all duration-300
+                ${
+                  selectedAmount === point.value
+                    ? "border-orange-500 bg-orange-500 scale-150"
+                    : "border-orange-500 bg-white hover:bg-orange-100"
+                }
+              `}
+              />
+
+              {/* Label */}
+              <span
+                className={`
+                absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap
+                text-sm transition-colors duration-300
+                ${
+                  selectedAmount === point.value
+                    ? "text-orange-500 font-medium"
+                    : "text-gray-600"
+                }
+              `}
+              >
+                {point.label}
+              </span>
             </button>
-            <button className="bg-white hover:bg-gray-50 text-gray-800 rounded-full px-4 py-2 text-sm font-semibold border border-gray-300 transition-colors duration-200 flex items-center gap-2">
-              💎 Built for Shopify
-            </button>
-          </div>
-
-          {/* Dollar Sign Vector Bottom Left */}
-          <div className="absolute -bottom-20 left-0">
-            <Image src="/vector.png" alt="" width={24} height={24} />
-          </div>
+          ))}
         </div>
+      </div>
 
-        {/* Right Section */}
-        <div className="relative flex items-center">
-          {/* Background decorative elements */}
-          <div className="absolute -z-10 -right-6 bottom-10 flex flex-col gap-4 transform">
-            <Image
-              src="/box1.png"
-              alt=""
-              width={64}
-              height={64}
-              className="rounded-md"
-            />
-            <Image
-              src="/box2.png"
-              alt=""
-              width={80}
-              height={80}
-              className="rounded-md"
-            />
-            {/* Dollar Sign Vector */}
-            <Image src="/vec1.png" alt="" width={24} height={24} />
-          </div>
-
-          {/* Main card with image */}
-          <div className="relative bg-white shadow-xl rounded-lg overflow-hidden w-60 md:w-72 lg:w-70 h-80 lg:h-[22rem]">
-            <Image
-              src="/cruise.webp"
-              alt="Person wearing a sweater"
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg"
-            />
-          </div>
-
-          {/* Overlapping product details card */}
-          <div className="absolute top-[40%] right-[22%] bg-white shadow-lg rounded-xl p-6 max-w-xs transform translate-x-8 lg:translate-x-12">
-            <div className="space-y-4">
-              <h2 className="text-lg md:text-2xl font-semibold text-purple-700">
-                Sweater in Everyday Cotton
-              </h2>
-
-              <p className="text-gray-600 text-xs leading-relaxed">
-                The perfect boxy-fit sweater, The Boxy Sweater in Everyday
-                Cotton is a layering essential. Featuring a chunky rib stitch at
-                the crew neckline, along the hem, and sleeve cuffs, it has
-                dropped shoulders for a relaxed edge. It's made with 100%
-                organic cotton, and designed to be styled solo or easily topped
-                with a blazer or cardigan.
-              </p>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-gray-700">
-                  Color: Brown
-                </p>
-                <div className="flex gap-2">
-                  <button className="w-5 h-5 rounded-full bg-[#c4a996] ring-2 ring-offset-2 ring-green-700"></button>
-                  <button className="w-5 h-5 rounded-full bg-slate-700"></button>
-                </div>
-              </div>
-
-              <button className="w-full bg-purple-700 text-white py-2 rounded-full text-base font-semibold transition-colors duration-200">
-                Add to Cart | $40
-              </button>
-            </div>
-          </div>
-        </div>
+      <div className="text-center">
+        <button
+          className="bg-orange-500 text-white px-8 py-2.5 rounded-md font-medium
+                     hover:bg-orange-600 transition-colors duration-300"
+        >
+          Donate Today
+        </button>
       </div>
     </div>
   );
