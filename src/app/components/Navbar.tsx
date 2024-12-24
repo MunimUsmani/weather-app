@@ -28,7 +28,7 @@ export default function Navbar() {
                   <Link
                     key={item}
                     href={`/${item.toLowerCase().replace(" ", "-")}`}
-                    className="text-white px-3 py-2 rounded-md text-sm font-medium"
+                    className="text-white px-3 py-2 rounded-md text-sm font-normal"
                   >
                     {item}
                   </Link>
