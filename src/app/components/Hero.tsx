@@ -2,7 +2,7 @@ function Card() {
   return (
     <section className="w-full px-4 py-26">
       <div className="container mx-auto max-w-5xl">
-        <h2 className="text-center text-2xl md:text-3xl font-bold mb-10">
+        <h2 className="text-center text-2xl md:text-3xl font-bold mb-12">
           With your donation you will help UNFPA in its mission to:
         </h2>
 
